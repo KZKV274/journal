@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f5a623" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="JOURNAL" />
+  <meta name="description" content="Личный ежедневник с синхронизацией Google Drive" />
+
+  <title>JOURNAL</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Apple touch icon (замени на свои иконки) -->
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+</head>
+<body>
+
+<!-- ═══ LOADER ═══════════════════════════════════════════════════ -->
+<div class="loader-overlay" id="loader">
+  <div class="loader-logo">JOUR<span>NAL</span></div>
+  <div class="loader-bar"></div>
+</div>
+
+<!-- ═══ APP ══════════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-logo">JOUR<span>NAL</span></div>
+    <div class="header-actions">
+      <button class="drive-badge" id="drive-badge" title="Google Drive синхронизация">☁ Drive</button>
+      <button class="icon-btn" id="btn-stats" title="Статистика">📊</button>
+      <button class="icon-btn" id="btn-settings" title="Настройки">⚙️</button>
+    </div>
+  </header>
+
+  <!-- ═══ VIEW: LIST ════════════════════════════════════════════ -->
+  <div class="view active" id="view-list">
+
+    <!-- Toolbar: поиск + фильтры -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="search-input" type="search" placeholder="Поиск по заметкам..." autocomplete="off" />
+      </div>
+      <div class="filter-row">
+        <button class="chip active" data-cat="Все">Все</button>
+        <button class="chip" data-cat="Личное">Личное</button>
+        <button class="chip" data-cat="Работа">Работа</button>
+        <button class="chip" data-cat="Идеи">Идеи</button>
+        <button class="chip" data-cat="Цели">Цели</button>
+        <button class="chip" data-cat="Другое">Другое</button>
+      </div>
+    </div>
+
+    <!-- Sort row -->
+    <div class="sort-row">
+      <span class="sort-label">Сорт:</span>
+      <button class="sort-btn active" data-sort="updated">По дате</button>
+      <button class="sort-btn" data-sort="created">По созданию</button>
+      <button class="sort-btn" data-sort="alpha">А–Я</button>
+      <span class="sort-count" id="sort-count">0 / 0</span>
+    </div>
+
+    <!-- Notes -->
+    <div class="notes-list" id="notes-list"></div>
+
+  </div><!-- /view-list -->
+
+  <!-- ═══ VIEW: EDITOR ══════════════════════════════════════════ -->
+  <div class="view" id="view-editor">
+
+    <div class="editor-header">
+      <button class="back-btn" id="back-btn">←</button>
+      <input class="editor-title-input" id="editor-title" type="text" placeholder="Заголовок..." maxlength="120" />
+    </div>
+
+    <div class="editor-meta">
+      <select class="meta-select" id="editor-category">
+        <option>Личное</option>
+        <option>Работа</option>
+        <option>Идеи</option>
+        <option>Цели</option>
+        <option>Другое</option>
+      </select>
+
+      <div class="mood-row">
+        <button class="mood-btn" data-mood="💀" title="Жесть">💀</button>
+        <button class="mood-btn" data-mood="😤" title="Злой">😤</button>
+        <button class="mood-btn" data-mood="😐" title="Норм">😐</button>
+        <button class="mood-btn" data-mood="😏" title="Неплохо">😏</button>
+        <button class="mood-btn" data-mood="🔥" title="Огонь">🔥</button>
+      </div>
+    </div>
+
+    <div class="editor-body">
+      <textarea class="content-textarea" id="editor-content" placeholder="Начни писать..."></textarea>
+    </div>
+
+    <div class="editor-footer">
+      <span id="word-count">0 симв. · 0 слов</span>
+      <button class="save-btn" id="save-btn">СОХРАНИТЬ</button>
+    </div>
+
+  </div><!-- /view-editor -->
+
+  <!-- ═══ VIEW: SETTINGS ════════════════════════════════════════ -->
+  <div class="view" id="view-settings">
+    <div class="settings-scroll">
+      <div class="settings-title">НАСТРОЙКИ</div>
+
+      <!-- Google Drive -->
+      <div class="settings-section">
+        <div class="settings-section-label">☁ Google Drive</div>
+
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Подключить Drive</div>
+            <div class="settings-sub">Войти в Google аккаунт<br/>и включить синхронизацию</div>
+          </div>
+          <button class="settings-btn primary" id="btn-connect-drive">Подключить</button>
+        </div>
+
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Синхронизировать</div>
+            <div class="settings-sub">Принудительно сохранить<br/>все заметки на Drive</div>
+          </div>
+          <button class="settings-btn" id="btn-sync-now">↻ Синхр.</button>
+        </div>
+      </div>
+
+      <!-- Backup -->
+      <div class="settings-section">
+        <div class="settings-section-label">📦 Резервная копия</div>
+
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Экспорт JSON</div>
+            <div class="settings-sub">Скачать все заметки на устройство</div>
+          </div>
+          <button class="settings-btn" id="btn-export">⬇ Скачать</button>
+        </div>
+
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Импорт JSON</div>
+            <div class="settings-sub">Загрузить заметки из файла</div>
+          </div>
+          <button class="settings-btn" id="btn-import-trigger">⬆ Загрузить</button>
+          <input type="file" id="import-input" accept=".json" style="display:none" />
+        </div>
+      </div>
+
+      <!-- Danger -->
+      <div class="settings-section">
+        <div class="settings-section-label">⚠ Опасная зона</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Очистить всё</div>
+            <div class="settings-sub">Удалить все заметки навсегда</div>
+          </div>
+          <button class="settings-btn danger" id="btn-clear-all">🗑 Удалить</button>
+        </div>
+      </div>
+
+      <div class="settings-version">
+        JOURNAL v1.0.0 · PWA<br/>
+        Данные: localStorage + Google Drive<br/>
+        Для PWA: добавь в GitHub Pages и установи на телефон
+      </div>
+    </div>
+  </div><!-- /view-settings -->
+
+  <!-- FAB -->
+  <button class="fab" id="fab" title="Новая запись">+</button>
+
+</div><!-- /app -->
+
+<!-- ═══ OVERLAYS ══════════════════════════════════════════════════ -->
+
+<!-- Stats -->
+<div class="overlay hidden" id="stats-overlay">
+  <div class="bottom-sheet">
+    <div class="sheet-title">СТАТИСТИКА</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">Всего записей</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-week">0</div><div class="stat-lbl">За эту неделю</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-pinned">0</div><div class="stat-lbl">Закреплено</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-avg">0</div><div class="stat-lbl">Средняя длина</div></div>
+    </div>
+    <div id="stats-cats"></div>
+    <button class="settings-btn" id="btn-close-stats" style="width:100%;margin-top:16px">Закрыть</button>
+  </div>
+</div>
+
+<!-- Confirm delete -->
+<div class="confirm-overlay hidden" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title">УДАЛИТЬ?</div>
+    <div class="confirm-text">Эта запись будет удалена без возможности восстановления. Уверен?</div>
+    <div class="confirm-actions">
+      <button class="btn-cancel" id="btn-confirm-cancel">Отмена</button>
+      <button class="btn-danger" id="btn-confirm-delete">Удалить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast hidden" id="toast"></div>
+
+<!-- Scripts -->
+<script src="app.js"></script>
+<script>
+  // Регистрация Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(console.warn);
+    });
+  }
+</script>
+
+</body>
+</html>
