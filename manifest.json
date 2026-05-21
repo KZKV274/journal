@@ -2,7 +2,7 @@
   "name": "JOURNAL — Ежедневник",
   "short_name": "JOURNAL",
   "description": "Личный ежедневник с синхронизацией Google Drive",
-  "start_url": "/",
+  "start_url": "/journal/",
   "display": "standalone",
   "background_color": "#0d0d0f",
   "theme_color": "#f5a623",
