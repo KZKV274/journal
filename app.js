@@ -9,7 +9,7 @@
 // 3. Application type: Web application
 // 4. Authorized JS origins: твой домен (например https://username.github.io)
 // 5. Вставь Client ID сюда:
-const GOOGLE_CLIENT_ID = 'ВСТАВЬ_СВОЙ_CLIENT_ID_СЮДА';
+const GOOGLE_CLIENT_ID = '603408798808-9ifrcd40k8c7i9akck6jkdivmos41e9d.apps.googleusercontent.com';
 
 const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
 const DRIVE_FILE_NAME = 'journal_data.json';
